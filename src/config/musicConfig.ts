@@ -51,8 +51,8 @@ export const musicPlayerConfig: MusicPlayerConfig = {
 		playlist: [
 			{
 				name: "诺德卡莱",
-				artist: "知更鸟 / HOYO-MiX",
-				url: "/assets/music/song/song.m4a",
+				artist: "HOYO-MiX",
+				url: "https://liujiahang.oss-cn-wulanchabu.aliyuncs.com/assets/music/song/诺德卡莱.m4a",
 				cover: "",
 				lrc: "",
 			},
