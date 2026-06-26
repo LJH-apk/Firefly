@@ -52,7 +52,7 @@ export const musicPlayerConfig: MusicPlayerConfig = {
 			{
 				name: "诺德卡莱",
 				artist: "HOYO-MiX",
-				url: "https://liujiahang.oss-cn-wulanchabu.aliyuncs.com/assets/music/song/诺德卡莱.m4a",
+				url: "https://liujiahang.oss-cn-wulanchabu.aliyuncs.com/assets/music/song/诺德卡莱.mp3",
 				cover: "",
 				lrc: "",
 			},
