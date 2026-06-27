@@ -54,7 +54,7 @@ export const musicPlayerConfig: MusicPlayerConfig = {
 				artist: "HOYO-MiX",
 				url: "https://liujiahang.oss-cn-wulanchabu.aliyuncs.com/assets/music/song/诺德卡莱.mp3",
 				cover: "",
-				lrc: "",
+				lrc: "/assets/music/lrc/挪德卡莱 Nod-Krai.lrc",
 			},
 		],
 	},
