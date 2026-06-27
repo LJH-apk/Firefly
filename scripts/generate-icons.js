@@ -71,6 +71,8 @@ function extractIconNames(content) {
 		/icon=\{[`"']([a-z0-9-]+:[a-z0-9-]+)[`"']\}/gi,
 		// name="xxx:yyy"（Icon 组件，只匹配已知图标集）
 		/name=["']((?:material-symbols|fa7-solid|fa7-brands|fa7-regular|mdi|simple-icons|mingcute|svg-spinners):[a-z0-9-]+)["']/gi,
+		// icon: "xxx:yyy"（配置文件中的对象属性写法，只匹配已知图标集）
+		/icon:\s*["']((?:material-symbols|fa7-solid|fa7-brands|fa7-regular|mdi|simple-icons|mingcute|svg-spinners):[a-z0-9-]+)["']/gi,
 		// getIconSvg("xxx:yyy") 或 getIconSvg('xxx:yyy')
 		/getIconSvg\(["']([a-z0-9-]+:[a-z0-9-]+)["']\)/gi,
 		// hasIcon("xxx:yyy")
@@ -206,6 +208,9 @@ async function main() {
 
 	// 获取所有源文件
 	const files = getAllFiles(SRC_DIR, [".svelte", ".astro"]);
+	// 额外扫描技能配置（.ts 配置文件默认不在扫描范围内，但其中以
+	// `icon: "simple-icons:xxx"` 形式声明的技能图标也需要内联）
+	files.push(join(SRC_DIR, "config", "skillsConfig.ts"));
 	console.log(`📁 找到 ${files.length} 个源文件\n`);
 
 	// 收集所有使用的图标

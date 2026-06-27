@@ -5,7 +5,7 @@ description: 测试对与代码样式的渲染
 tags: [Code, Math, 测试]
 category: 测试文章
 draft: false
-image: "src/content/posts/blog2/firefly2.avif"
+image: "firefly2.avif"
 ---
 
 本文用于测试博客对与代码的渲染支持
