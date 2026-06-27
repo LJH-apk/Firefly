@@ -17,7 +17,7 @@ import type { SkillsConfig } from "../types/skillsConfig";
 
 export const skillsConfig: SkillsConfig = {
 	enable: true, // 是否显示技能区
-	title: "🛠️ 我的技能", // 区块标题
+	title: " 我的技能", // 区块标题
 	itemsPerPage: 8, // 每页显示的技能数量（超过则自动分页）
 
 	categories: [
@@ -25,15 +25,10 @@ export const skillsConfig: SkillsConfig = {
 			id: "frontend",
 			name: "前端",
 			skills: [
-				{ name: "HTML5", level: 90, icon: "simple-icons:html5", color: "#E34F26" },
-				{ name: "JavaScript", level: 85, icon: "simple-icons:javascript", color: "#F7DF1E" },
-				{ name: "TypeScript", level: 80, icon: "simple-icons:typescript", color: "#3178C6" },
-				{ name: "Vue.js", level: 85, icon: "simple-icons:vuedotjs", color: "#4FC08D" },
+				{ name: "HTML5", level: 70, icon: "simple-icons:html5", color: "#E34F26" },
+				{ name: "JavaScript", level: 80, icon: "simple-icons:javascript", color: "#F7DF1E" },
+				{ name: "Vue.js", level: 65, icon: "simple-icons:vuedotjs", color: "#4FC08D" },
 				{ name: "React", level: 75, icon: "simple-icons:react", color: "#61DAFB" },
-				{ name: "Tailwind CSS", level: 85, icon: "simple-icons:tailwindcss", color: "#06B6D4" },
-				{ name: "Astro", level: 80, icon: "simple-icons:astro", color: "#FF5D01" },
-				{ name: "Svelte", level: 70, icon: "simple-icons:svelte", color: "#FF3E00" },
-				{ name: "Sass", level: 75, icon: "simple-icons:sass", color: "#CC6699" },
 				{ name: "Vite", level: 70, icon: "simple-icons:vite", color: "#646CFF" },
 			],
 		},
@@ -41,10 +36,11 @@ export const skillsConfig: SkillsConfig = {
 			id: "backend",
 			name: "后端",
 			skills: [
-				{ name: "Python", level: 85, icon: "simple-icons:python", color: "#3776AB" },
-				{ name: "Node.js", level: 75, icon: "simple-icons:nodedotjs", color: "#5FA04E" },
-				{ name: "MySQL", level: 70, icon: "simple-icons:mysql", color: "#4479A1" },
-				{ name: "Redis", level: 60, icon: "simple-icons:redis", color: "#FF4438" },
+				{ name: "Python", level: 80, icon: "simple-icons:python", color: "#3776AB" },
+				{ name: "Java", level: 70, icon: "devicon:java", color: "#d59815" },
+				{ name: "Node.js", level: 40, icon: "simple-icons:nodedotjs", color: "#5FA04E" },
+				{ name: "MySQL", level: 30, icon: "simple-icons:mysql", color: "#4479A1" },
+				{ name: "Redis", level: 40, icon: "simple-icons:redis", color: "#FF4438" },
 			],
 		},
 		{
@@ -52,12 +48,28 @@ export const skillsConfig: SkillsConfig = {
 			name: "工具 & 其它",
 			skills: [
 				{ name: "Git", level: 85, icon: "simple-icons:git", color: "#F05032" },
-				{ name: "GitHub", level: 85, icon: "simple-icons:github" },
-				{ name: "Docker", level: 65, icon: "simple-icons:docker", color: "#2496ED" },
+				{ name: "GitHub", level: 30, icon: "simple-icons:github" },
 				{ name: "Linux", level: 70, icon: "simple-icons:linux", color: "#FCC624" },
-				{ name: "Figma", level: 60, icon: "simple-icons:figma", color: "#F24E1E" },
-				{ name: "Postman", level: 70, icon: "simple-icons:postman", color: "#FF6C37" },
+				{ name: "Postman", level: 50, icon: "simple-icons:postman", color: "#FF6C37" },
 			],
 		},
+		{
+			id: "other",
+			name: "办公软件",
+			skills: [
+				{ name: "Word", level: 80, icon: "simple-icons:microsoftword", color: "#2B579A" },
+				{ name: "Excel", level: 80, icon: "simple-icons:microsoftexcel", color: "#217346" },
+				{ name: "PowerPoint", level: 80, icon: "simple-icons:microsoftpowerpoint", color: "#D24726" },
+			]
+		},
+		{
+			id: "design",
+			name: "设计工具",
+			skills: [
+				{ name: "Photoshop", level: 70, icon: "simple-icons:adobephotoshop", color: "#31A8FF" },
+				{ name: "Illustrator", level: 60, icon: "simple-icons:adobeillustrator", color: "#FF9A00" },
+				{ name: "Premiere Pro", level: 50, icon: "simple-icons:adobepremierepro", color: "#9999FF" },
+			]
+		}
 	],
 };

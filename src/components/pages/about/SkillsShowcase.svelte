@@ -69,7 +69,7 @@ onMount(() => {
 				>
 					<!-- 图标 -->
 					<div class="flex h-10 w-10 shrink-0 items-center justify-center">
-						<Icon name={skill.icon ?? ""} color={skill.color} size="2xl" />
+						<Icon icon={skill.icon ?? ""} color={skill.color} size="2xl" />
 					</div>
 
 					<!-- 名称 + 熟练度 -->
