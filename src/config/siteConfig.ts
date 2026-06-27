@@ -65,11 +65,11 @@ export const siteConfig: SiteConfig = {
 		// 4. 网络图片: { type: "url", value: "https://example.com/logo.png", alt: "Logo" }
 		logo: {
 			type: "image",
-			value: "assets/images/firefly.png",
-			alt: "Firefly",
+			value: "assets/images/logo.webp",
+			alt: "Logo",
 		},
 		// 导航栏标题
-		title: "小刘の宝藏空间",
+		title: "小刘の神秘小站",
 		// 全宽导航栏，导航栏是否占满屏幕宽度
 		widthFull: false,
 		// 导航菜单对齐方式，left：左对齐，center：居中
