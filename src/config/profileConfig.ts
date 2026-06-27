@@ -7,7 +7,7 @@ export const profileConfig: ProfileConfig = {
 	// 2. src 目录（不以 "/" 开头，自动优化但会增加构建时间，推荐）："assets/images/avatar.webp"
 	// 3. 远程 URL："https://example.com/avatar.jpg"
 	avatar:
-		"https://liujiahang.oss-cn-wulanchabu.aliyuncs.com/assets/images/columbia-avatar.webp",
+		"assets/images/avatar.avif",
 
 	// 名字
 	name: "小刘同学",
