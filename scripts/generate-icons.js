@@ -69,6 +69,8 @@ function extractIconNames(content) {
 		/icon=["']([a-z0-9-]+:[a-z0-9-]+)["']/gi,
 		// icon={`xxx:yyy`}
 		/icon=\{[`"']([a-z0-9-]+:[a-z0-9-]+)[`"']\}/gi,
+		// name="xxx:yyy"（Icon 组件，只匹配已知图标集）
+		/name=["']((?:material-symbols|fa7-solid|fa7-brands|fa7-regular|mdi|simple-icons|mingcute|svg-spinners):[a-z0-9-]+)["']/gi,
 		// getIconSvg("xxx:yyy") 或 getIconSvg('xxx:yyy')
 		/getIconSvg\(["']([a-z0-9-]+:[a-z0-9-]+)["']\)/gi,
 		// hasIcon("xxx:yyy")
@@ -203,7 +205,7 @@ async function main() {
 	console.log("🔍 扫描源文件中的图标使用...\n");
 
 	// 获取所有源文件
-	const files = getAllFiles(SRC_DIR);
+	const files = getAllFiles(SRC_DIR, [".svelte", ".astro"]);
 	console.log(`📁 找到 ${files.length} 个源文件\n`);
 
 	// 收集所有使用的图标

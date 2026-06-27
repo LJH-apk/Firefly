@@ -15,17 +15,10 @@ export const siteConfig: SiteConfig = {
 	site_url: "https://your-domain.pages.dev",
 
 	// 站点描述
-	description:
-		"小刘同学的个人博客，记录生活、思考与探索。愿此行，终抵群星。",
+	description: "小刘同学的个人博客，记录生活、思考与探索。愿此行，终抵群星。",
 
 	// 站点关键词
-	keywords: [
-		"小刘同学",
-		"博客",
-		"个人博客",
-		"生活",
-		"随笔",
-	],
+	keywords: ["小刘同学", "博客", "个人博客", "生活", "随笔"],
 
 	// 主题色
 	themeColor: {

@@ -1,50 +1,97 @@
 <script lang="ts">
-import { onMount } from 'svelte'
-import { marked } from 'marked'
+import { marked } from "marked";
+import { onMount } from "svelte";
 
-marked.setOptions({ breaks: true, gfm: true })
+marked.setOptions({ breaks: true, gfm: true });
 
-type Config = { pat: string; owner: string; repo: string; branch: string }
-type TreeItem = { path: string; sha: string; type: string }
-type PostItem = { path: string; sha: string; name: string; filename: string }
+type Config = { pat: string; owner: string; repo: string; branch: string };
+type TreeItem = { path: string; sha: string; type: string };
+type PostItem = { path: string; sha: string; name: string; filename: string };
 type Post = {
-	title: string; published: string; updated: string; description: string
-	image: string; tags: string; category: string; draft: boolean; pinned: boolean
-	lang: string; author: string; comment: boolean; password: string; passwordHint: string
-	body: string; _sha: string; _path: string; _filename: string; _isNew: boolean
-}
+	title: string;
+	published: string;
+	updated: string;
+	description: string;
+	image: string;
+	tags: string;
+	category: string;
+	draft: boolean;
+	pinned: boolean;
+	lang: string;
+	author: string;
+	comment: boolean;
+	password: string;
+	passwordHint: string;
+	body: string;
+	_sha: string;
+	_path: string;
+	_filename: string;
+	_isNew: boolean;
+};
 
-let view = $state<'setup' | 'list' | 'editor'>('setup')
-let cfg = $state<Config>({ pat: '', owner: '', repo: '', branch: 'master' })
-let postList = $state<PostItem[]>([])
-let post = $state<Post | null>(null)
-let loading = $state(false)
-let saving = $state(false)
-let errorMsg = $state('')
-let successMsg = $state('')
-let searchQ = $state('')
-let isDemo = $state(false)
-let editorMode = $state<'edit' | 'split' | 'preview'>('split')
+let view = $state<"setup" | "list" | "editor">("setup");
+let cfg = $state<Config>({ pat: "", owner: "", repo: "", branch: "master" });
+let postList = $state<PostItem[]>([]);
+let post = $state<Post | null>(null);
+let loading = $state(false);
+let saving = $state(false);
+let errorMsg = $state("");
+let successMsg = $state("");
+let searchQ = $state("");
+let isDemo = $state(false);
+let editorMode = $state<"edit" | "split" | "preview">("split");
 
-const previewHtml = $derived(
-	post ? marked(post.body) as string : ''
-)
+const previewHtml = $derived(post ? (marked(post.body) as string) : "");
 
 const DEMO_POSTS: PostItem[] = [
-	{ path: 'src/content/posts/hello-world.md', sha: 'demo1', name: 'hello-world.md', filename: 'hello-world.md' },
-	{ path: 'src/content/posts/astro-svelte-guide.md', sha: 'demo2', name: 'astro-svelte-guide.md', filename: 'astro-svelte-guide.md' },
-	{ path: 'src/content/posts/cloudflare-workers-tips.md', sha: 'demo3', name: 'cloudflare-workers-tips.md', filename: 'cloudflare-workers-tips.md' },
-	{ path: 'src/content/posts/draft-post.md', sha: 'demo4', name: 'draft-post.md', filename: 'draft-post.md' },
-	{ path: 'src/content/posts/life/weekend-trip.md', sha: 'demo5', name: 'life/weekend-trip.md', filename: 'weekend-trip.md' },
-]
+	{
+		path: "src/content/posts/hello-world.md",
+		sha: "demo1",
+		name: "hello-world.md",
+		filename: "hello-world.md",
+	},
+	{
+		path: "src/content/posts/astro-svelte-guide.md",
+		sha: "demo2",
+		name: "astro-svelte-guide.md",
+		filename: "astro-svelte-guide.md",
+	},
+	{
+		path: "src/content/posts/cloudflare-workers-tips.md",
+		sha: "demo3",
+		name: "cloudflare-workers-tips.md",
+		filename: "cloudflare-workers-tips.md",
+	},
+	{
+		path: "src/content/posts/draft-post.md",
+		sha: "demo4",
+		name: "draft-post.md",
+		filename: "draft-post.md",
+	},
+	{
+		path: "src/content/posts/life/weekend-trip.md",
+		sha: "demo5",
+		name: "life/weekend-trip.md",
+		filename: "weekend-trip.md",
+	},
+];
 
 const DEMO_POST_CONTENT: Record<string, Post> = {
-	'demo1': {
-		title: '你好，世界', published: '2025-01-01', updated: '2025-03-10',
-		description: '博客的第一篇文章，介绍这个站点的由来和目标。',
-		image: './images/cover.jpg', tags: '随笔, 生活', category: '碎碎念',
-		draft: false, pinned: true, lang: '', author: '', comment: true,
-		password: '', passwordHint: '',
+	demo1: {
+		title: "你好，世界",
+		published: "2025-01-01",
+		updated: "2025-03-10",
+		description: "博客的第一篇文章，介绍这个站点的由来和目标。",
+		image: "./images/cover.jpg",
+		tags: "随笔, 生活",
+		category: "碎碎念",
+		draft: false,
+		pinned: true,
+		lang: "",
+		author: "",
+		comment: true,
+		password: "",
+		passwordHint: "",
 		body: `## 开始
 
 欢迎来到我的博客！这里会记录我的技术探索和生活感悟。
@@ -57,23 +104,49 @@ const DEMO_POST_CONTENT: Record<string, Post> = {
 
 > 人生就是一场旅行，重要的不是目的地，而是沿途的风景。
 `,
-		_sha: 'demo1', _path: 'src/content/posts/hello-world.md', _filename: 'hello-world.md', _isNew: false,
+		_sha: "demo1",
+		_path: "src/content/posts/hello-world.md",
+		_filename: "hello-world.md",
+		_isNew: false,
 	},
-	'demo2': {
-		title: 'Astro + Svelte 5 开发指南', published: '2025-06-01', updated: '',
-		description: '详细介绍如何在 Astro 项目中使用 Svelte 5 的新特性，包括 Runes 语法和响应式状态管理。',
-		image: '', tags: 'Astro, Svelte, 前端', category: '技术',
-		draft: false, pinned: false, lang: '', author: '', comment: true,
-		password: '', passwordHint: '',
-		body: '## 前言\n\nSvelte 5 带来了全新的 Runes 语法，配合 Astro 的岛屿架构，可以打造极致性能的静态站点。\n\n## 安装\n\n```bash\npnpm create astro@latest\npnpm add svelte @astrojs/svelte\n```\n\n## 使用 $state\n\n响应式状态用 `$state()` 声明，`$derived()` 声明计算值，`onclick` 代替 `on:click`。\n',
-		_sha: 'demo2', _path: 'src/content/posts/astro-svelte-guide.md', _filename: 'astro-svelte-guide.md', _isNew: false,
+	demo2: {
+		title: "Astro + Svelte 5 开发指南",
+		published: "2025-06-01",
+		updated: "",
+		description:
+			"详细介绍如何在 Astro 项目中使用 Svelte 5 的新特性，包括 Runes 语法和响应式状态管理。",
+		image: "",
+		tags: "Astro, Svelte, 前端",
+		category: "技术",
+		draft: false,
+		pinned: false,
+		lang: "",
+		author: "",
+		comment: true,
+		password: "",
+		passwordHint: "",
+		body: "## 前言\n\nSvelte 5 带来了全新的 Runes 语法，配合 Astro 的岛屿架构，可以打造极致性能的静态站点。\n\n## 安装\n\n```bash\npnpm create astro@latest\npnpm add svelte @astrojs/svelte\n```\n\n## 使用 $state\n\n响应式状态用 `$state()` 声明，`$derived()` 声明计算值，`onclick` 代替 `on:click`。\n",
+		_sha: "demo2",
+		_path: "src/content/posts/astro-svelte-guide.md",
+		_filename: "astro-svelte-guide.md",
+		_isNew: false,
 	},
-	'demo3': {
-		title: 'Cloudflare Workers 实用技巧', published: '2025-08-15', updated: '',
-		description: '总结在使用 Cloudflare Workers 部署静态博客时踩过的坑和积累的经验。',
-		image: '', tags: 'Cloudflare, 部署, 运维', category: '技术',
-		draft: false, pinned: false, lang: '', author: '', comment: true,
-		password: '', passwordHint: '',
+	demo3: {
+		title: "Cloudflare Workers 实用技巧",
+		published: "2025-08-15",
+		updated: "",
+		description:
+			"总结在使用 Cloudflare Workers 部署静态博客时踩过的坑和积累的经验。",
+		image: "",
+		tags: "Cloudflare, 部署, 运维",
+		category: "技术",
+		draft: false,
+		pinned: false,
+		lang: "",
+		author: "",
+		comment: true,
+		password: "",
+		passwordHint: "",
 		body: `## wrangler.jsonc 配置
 
 最简静态资源托管配置：
@@ -90,22 +163,47 @@ const DEMO_POST_CONTENT: Record<string, Post> = {
 
 推送到 GitHub 后，Cloudflare 会自动触发构建和部署。
 `,
-		_sha: 'demo3', _path: 'src/content/posts/cloudflare-workers-tips.md', _filename: 'cloudflare-workers-tips.md', _isNew: false,
+		_sha: "demo3",
+		_path: "src/content/posts/cloudflare-workers-tips.md",
+		_filename: "cloudflare-workers-tips.md",
+		_isNew: false,
 	},
-	'demo4': {
-		title: '未发布的草稿', published: '2026-06-26', updated: '',
-		description: '', image: '', tags: '', category: '',
-		draft: true, pinned: false, lang: '', author: '', comment: true,
-		password: '', passwordHint: '',
-		body: '## 待续\n\n这篇文章还没写完...\n',
-		_sha: 'demo4', _path: 'src/content/posts/draft-post.md', _filename: 'draft-post.md', _isNew: false,
+	demo4: {
+		title: "未发布的草稿",
+		published: "2026-06-26",
+		updated: "",
+		description: "",
+		image: "",
+		tags: "",
+		category: "",
+		draft: true,
+		pinned: false,
+		lang: "",
+		author: "",
+		comment: true,
+		password: "",
+		passwordHint: "",
+		body: "## 待续\n\n这篇文章还没写完...\n",
+		_sha: "demo4",
+		_path: "src/content/posts/draft-post.md",
+		_filename: "draft-post.md",
+		_isNew: false,
 	},
-	'demo5': {
-		title: '周末出游记', published: '2025-05-20', updated: '',
-		description: '趁着五一假期，去了附近的山里转了转。', image: '',
-		tags: '生活, 旅行', category: '生活',
-		draft: false, pinned: false, lang: '', author: '', comment: true,
-		password: '', passwordHint: '',
+	demo5: {
+		title: "周末出游记",
+		published: "2025-05-20",
+		updated: "",
+		description: "趁着五一假期，去了附近的山里转了转。",
+		image: "",
+		tags: "生活, 旅行",
+		category: "生活",
+		draft: false,
+		pinned: false,
+		lang: "",
+		author: "",
+		comment: true,
+		password: "",
+		passwordHint: "",
 		body: `## 出发
 
 早上六点出门，天色还没全亮，空气格外清新。
@@ -114,236 +212,367 @@ const DEMO_POST_CONTENT: Record<string, Post> = {
 
 爬到顶上的时候已经快十点了，俯瞰山下的城市，感觉平时的烦恼都变小了。
 `,
-		_sha: 'demo5', _path: 'src/content/posts/life/weekend-trip.md', _filename: 'weekend-trip.md', _isNew: false,
+		_sha: "demo5",
+		_path: "src/content/posts/life/weekend-trip.md",
+		_filename: "weekend-trip.md",
+		_isNew: false,
 	},
-}
+};
 
 function enterDemo() {
-	isDemo = true
-	postList = DEMO_POSTS
-	view = 'list'
+	isDemo = true;
+	postList = DEMO_POSTS;
+	view = "list";
 }
 
 function exitDemo() {
-	isDemo = false
-	postList = []
-	post = null
-	view = 'setup'
+	isDemo = false;
+	postList = [];
+	post = null;
+	view = "setup";
 }
 
 function openDemoPost(item: PostItem) {
-	const content = DEMO_POST_CONTENT[item.sha]
-	if (content) { post = { ...content }; view = 'editor' }
+	const content = DEMO_POST_CONTENT[item.sha];
+	if (content) {
+		post = { ...content };
+		view = "editor";
+	}
 }
 
 const filtered = $derived(
 	searchQ.trim()
-		? postList.filter(p => p.name.toLowerCase().includes(searchQ.toLowerCase()))
-		: postList
-)
+		? postList.filter((p) =>
+				p.name.toLowerCase().includes(searchQ.toLowerCase()),
+			)
+		: postList,
+);
 
 onMount(() => {
-	const saved = localStorage.getItem('blog-admin-cfg')
+	const saved = localStorage.getItem("blog-admin-cfg");
 	if (saved) {
-		try { cfg = JSON.parse(saved); view = 'list'; loadList() } catch {}
+		try {
+			cfg = JSON.parse(saved);
+			view = "list";
+			loadList();
+		} catch {}
 	}
-})
+});
 
 function ghHeaders(extra: Record<string, string> = {}) {
 	return {
-		'Authorization': `Bearer ${cfg.pat}`,
-		'Accept': 'application/vnd.github+json',
-		'X-GitHub-Api-Version': '2022-11-28',
+		Authorization: `Bearer ${cfg.pat}`,
+		Accept: "application/vnd.github+json",
+		"X-GitHub-Api-Version": "2022-11-28",
 		...extra,
-	}
+	};
 }
 
 async function ghFetch(path: string, opts: RequestInit = {}) {
 	const r = await fetch(`https://api.github.com${path}`, {
 		...opts,
-		headers: { ...ghHeaders(), ...(opts.headers as Record<string, string> || {}) },
-	})
-	const d = await r.json()
-	if (!r.ok) throw new Error(d.message || `HTTP ${r.status}`)
-	return d
+		headers: {
+			...ghHeaders(),
+			...((opts.headers as Record<string, string>) || {}),
+		},
+	});
+	const d = await r.json();
+	if (!r.ok) throw new Error(d.message || `HTTP ${r.status}`);
+	return d;
 }
 
 function b64decode(s: string): string {
-	const bin = atob(s.replace(/\s/g, ''))
-	return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)))
+	const bin = atob(s.replace(/\s/g, ""));
+	return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
 }
 
 function b64encode(s: string): string {
-	const bytes = new TextEncoder().encode(s)
-	const chunk = 8192
-	let bin = ''
+	const bytes = new TextEncoder().encode(s);
+	const chunk = 8192;
+	let bin = "";
 	for (let i = 0; i < bytes.length; i += chunk)
-		bin += String.fromCharCode(...bytes.subarray(i, i + chunk))
-	return btoa(bin)
+		bin += String.fromCharCode(...bytes.subarray(i, i + chunk));
+	return btoa(bin);
 }
 
 async function loadList() {
-	loading = true; errorMsg = ''
+	loading = true;
+	errorMsg = "";
 	try {
-		const tree = await ghFetch(`/repos/${cfg.owner}/${cfg.repo}/git/trees/${cfg.branch}?recursive=1`)
+		const tree = await ghFetch(
+			`/repos/${cfg.owner}/${cfg.repo}/git/trees/${cfg.branch}?recursive=1`,
+		);
 		postList = (tree.tree as TreeItem[])
-			.filter(i => i.type === 'blob' && i.path.startsWith('src/content/posts/') && /\.(md|mdx)$/.test(i.path))
-			.map(i => ({
+			.filter(
+				(i) =>
+					i.type === "blob" &&
+					i.path.startsWith("src/content/posts/") &&
+					/\.(md|mdx)$/.test(i.path),
+			)
+			.map((i) => ({
 				path: i.path,
 				sha: i.sha,
-				name: i.path.replace('src/content/posts/', ''),
-				filename: i.path.split('/').pop()!,
+				name: i.path.replace("src/content/posts/", ""),
+				filename: i.path.split("/").pop() ?? i.path,
 			}))
-			.sort((a, b) => a.name.localeCompare(b.name))
-	} catch (e) { errorMsg = String(e) }
-	finally { loading = false }
+			.sort((a, b) => a.name.localeCompare(b.name));
+	} catch (e) {
+		errorMsg = String(e);
+	} finally {
+		loading = false;
+	}
 }
 
 function parseFM(raw: string): Post {
-	const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/)
-	if (!m) return { ...emptyPost(), body: raw }
+	const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+	if (!m) return { ...emptyPost(), body: raw };
 
-	const fm = m[1]
-	const body = m[2].replace(/^\n/, '')
+	const fm = m[1];
+	const body = m[2].replace(/^\n/, "");
 
 	const s = (k: string) => {
-		const x = fm.match(new RegExp(`^${k}:\\s*(.+)$`, 'm'))
-		return x ? x[1].trim().replace(/^['"]|['"]$/g, '') : ''
-	}
-	const b = (k: string, def: boolean) => { const v = s(k); return v === '' ? def : v === 'true' }
+		const x = fm.match(new RegExp(`^${k}:\\s*(.+)$`, "m"));
+		return x ? x[1].trim().replace(/^['"]|['"]$/g, "") : "";
+	};
+	const b = (k: string, def: boolean) => {
+		const v = s(k);
+		return v === "" ? def : v === "true";
+	};
 
-	let tags = ''
-	const tagsInline = fm.match(/^tags:\s*\[([^\]]*)\]/m)
-	const tagsMulti = fm.match(/^tags:\s*\n((?:[ \t]*-[ \t]*.+\n?)*)/m)
+	let tags = "";
+	const tagsInline = fm.match(/^tags:\s*\[([^\]]*)\]/m);
+	const tagsMulti = fm.match(/^tags:\s*\n((?:[ \t]*-[ \t]*.+\n?)*)/m);
 	if (tagsInline) {
-		tags = tagsInline[1].replace(/['"]/g, '').split(',').map(t => t.trim()).filter(Boolean).join(', ')
+		tags = tagsInline[1]
+			.replace(/['"]/g, "")
+			.split(",")
+			.map((t) => t.trim())
+			.filter(Boolean)
+			.join(", ");
 	} else if (tagsMulti) {
-		tags = tagsMulti[1].split('\n').map(l => l.replace(/^\s*-\s*/, '').replace(/['"]/g, '').trim()).filter(Boolean).join(', ')
+		tags = tagsMulti[1]
+			.split("\n")
+			.map((l) =>
+				l
+					.replace(/^\s*-\s*/, "")
+					.replace(/['"]/g, "")
+					.trim(),
+			)
+			.filter(Boolean)
+			.join(", ");
 	}
 
 	return {
-		title: s('title'), published: s('published'), updated: s('updated'),
-		description: s('description'), image: s('image'), tags, category: s('category'),
-		draft: b('draft', false), pinned: b('pinned', false), lang: s('lang'),
-		author: s('author'), comment: b('comment', true),
-		password: s('password'), passwordHint: s('passwordHint'),
-		body, _sha: '', _path: '', _filename: '', _isNew: false,
-	}
+		title: s("title"),
+		published: s("published"),
+		updated: s("updated"),
+		description: s("description"),
+		image: s("image"),
+		tags,
+		category: s("category"),
+		draft: b("draft", false),
+		pinned: b("pinned", false),
+		lang: s("lang"),
+		author: s("author"),
+		comment: b("comment", true),
+		password: s("password"),
+		passwordHint: s("passwordHint"),
+		body,
+		_sha: "",
+		_path: "",
+		_filename: "",
+		_isNew: false,
+	};
 }
 
 function emptyPost(): Post {
 	return {
-		title: '', published: new Date().toISOString().slice(0, 10), updated: '',
-		description: '', image: '', tags: '', category: '',
-		draft: true, pinned: false, lang: '', author: '', comment: true,
-		password: '', passwordHint: '', body: '## 正文\n\n',
-		_sha: '', _path: '', _filename: '', _isNew: true,
-	}
+		title: "",
+		published: new Date().toISOString().slice(0, 10),
+		updated: "",
+		description: "",
+		image: "",
+		tags: "",
+		category: "",
+		draft: true,
+		pinned: false,
+		lang: "",
+		author: "",
+		comment: true,
+		password: "",
+		passwordHint: "",
+		body: "## 正文\n\n",
+		_sha: "",
+		_path: "",
+		_filename: "",
+		_isNew: true,
+	};
 }
 
 function buildContent(p: Post): string {
-	const tags = `[${p.tags.split(',').map(t => t.trim()).filter(Boolean).join(', ')}]`
-	const lines = ['---', `title: ${p.title}`, `published: ${p.published}`]
-	if (p.updated) lines.push(`updated: ${p.updated}`)
-	if (p.description) lines.push(`description: ${p.description}`)
-	if (p.image) lines.push(`image: ${p.image}`)
-	lines.push(`tags: ${tags}`)
-	if (p.category) lines.push(`category: ${p.category}`)
-	lines.push(`draft: ${p.draft}`)
-	if (p.pinned) lines.push(`pinned: ${p.pinned}`)
-	if (p.lang) lines.push(`lang: ${p.lang}`)
-	if (p.author) lines.push(`author: ${p.author}`)
-	lines.push(`comment: ${p.comment}`)
-	if (p.password) lines.push(`password: ${p.password}`)
-	if (p.passwordHint) lines.push(`passwordHint: ${p.passwordHint}`)
-	lines.push('---', '')
-	return lines.join('\n') + p.body
+	const tags = `[${p.tags
+		.split(",")
+		.map((t) => t.trim())
+		.filter(Boolean)
+		.join(", ")}]`;
+	const lines = ["---", `title: ${p.title}`, `published: ${p.published}`];
+	if (p.updated) lines.push(`updated: ${p.updated}`);
+	if (p.description) lines.push(`description: ${p.description}`);
+	if (p.image) lines.push(`image: ${p.image}`);
+	lines.push(`tags: ${tags}`);
+	if (p.category) lines.push(`category: ${p.category}`);
+	lines.push(`draft: ${p.draft}`);
+	if (p.pinned) lines.push(`pinned: ${p.pinned}`);
+	if (p.lang) lines.push(`lang: ${p.lang}`);
+	if (p.author) lines.push(`author: ${p.author}`);
+	lines.push(`comment: ${p.comment}`);
+	if (p.password) lines.push(`password: ${p.password}`);
+	if (p.passwordHint) lines.push(`passwordHint: ${p.passwordHint}`);
+	lines.push("---", "");
+	return lines.join("\n") + p.body;
 }
 
 async function openPost(item: PostItem) {
-	if (isDemo) { openDemoPost(item); return }
-	loading = true; errorMsg = ''
+	if (isDemo) {
+		openDemoPost(item);
+		return;
+	}
+	loading = true;
+	errorMsg = "";
 	try {
-		const data = await ghFetch(`/repos/${cfg.owner}/${cfg.repo}/contents/${item.path}`)
-		const raw = b64decode(data.content)
-		post = { ...parseFM(raw), _sha: data.sha, _path: item.path, _filename: item.filename, _isNew: false }
-		view = 'editor'
-	} catch (e) { errorMsg = String(e) }
-	finally { loading = false }
+		const data = await ghFetch(
+			`/repos/${cfg.owner}/${cfg.repo}/contents/${item.path}`,
+		);
+		const raw = b64decode(data.content);
+		post = {
+			...parseFM(raw),
+			_sha: data.sha,
+			_path: item.path,
+			_filename: item.filename,
+			_isNew: false,
+		};
+		view = "editor";
+	} catch (e) {
+		errorMsg = String(e);
+	} finally {
+		loading = false;
+	}
 }
 
 function newPost() {
-	post = emptyPost()
-	view = 'editor'
+	post = emptyPost();
+	view = "editor";
 }
 
 async function save() {
-	if (!post) return
-	if (isDemo) { successMsg = '✓ 演示模式：已模拟保存成功（不会真正提交到 GitHub）'; return }
-	if (!post.title.trim()) { errorMsg = '标题不能为空'; return }
-	saving = true; errorMsg = ''; successMsg = ''
+	if (!post) return;
+	if (isDemo) {
+		successMsg = "✓ 演示模式：已模拟保存成功（不会真正提交到 GitHub）";
+		return;
+	}
+	if (!post.title.trim()) {
+		errorMsg = "标题不能为空";
+		return;
+	}
+	saving = true;
+	errorMsg = "";
+	successMsg = "";
 	try {
-		const filename = post._filename || slugify(post.title) + '.md'
-		const path = post._path || `src/content/posts/${filename}`
+		const filename = post._filename || `${slugify(post.title)}.md`;
+		const path = post._path || `src/content/posts/${filename}`;
 		const body: Record<string, string> = {
-			message: post._isNew ? `feat: 新增文章「${post.title}」` : `chore: 更新文章「${post.title}」`,
+			message: post._isNew
+				? `feat: 新增文章「${post.title}」`
+				: `chore: 更新文章「${post.title}」`,
 			content: b64encode(buildContent(post)),
 			branch: cfg.branch,
-		}
-		if (post._sha) body.sha = post._sha
-		const data = await ghFetch(`/repos/${cfg.owner}/${cfg.repo}/contents/${path}`, {
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(body),
-		})
-		post._sha = data.content.sha
-		post._path = path
-		post._filename = filename
-		post._isNew = false
-		successMsg = '✓ 保存成功，Cloudflare 正在自动重新部署...'
-		loadList()
-	} catch (e) { errorMsg = String(e) }
-	finally { saving = false }
+		};
+		if (post._sha) body.sha = post._sha;
+		const data = await ghFetch(
+			`/repos/${cfg.owner}/${cfg.repo}/contents/${path}`,
+			{
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(body),
+			},
+		);
+		post._sha = data.content.sha;
+		post._path = path;
+		post._filename = filename;
+		post._isNew = false;
+		successMsg = "✓ 保存成功，Cloudflare 正在自动重新部署...";
+		loadList();
+	} catch (e) {
+		errorMsg = String(e);
+	} finally {
+		saving = false;
+	}
 }
 
 async function deletePost() {
-	if (isDemo) { successMsg = '✓ 演示模式：不会真正删除'; return }
-	if (!post?._sha || !confirm(`确定删除「${post.title}」吗？此操作不可撤销。`)) return
-	saving = true; errorMsg = ''
+	if (isDemo) {
+		successMsg = "✓ 演示模式：不会真正删除";
+		return;
+	}
+	if (!post?._sha || !confirm(`确定删除「${post.title}」吗？此操作不可撤销。`))
+		return;
+	saving = true;
+	errorMsg = "";
 	try {
 		await ghFetch(`/repos/${cfg.owner}/${cfg.repo}/contents/${post._path}`, {
-			method: 'DELETE',
-			headers: { 'Content-Type': 'application/json' },
+			method: "DELETE",
+			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
 				message: `chore: 删除文章「${post.title}」`,
 				sha: post._sha,
 				branch: cfg.branch,
 			}),
-		})
-		post = null; view = 'list'; loadList()
-	} catch (e) { errorMsg = String(e) }
-	finally { saving = false }
+		});
+		post = null;
+		view = "list";
+		loadList();
+	} catch (e) {
+		errorMsg = String(e);
+	} finally {
+		saving = false;
+	}
 }
 
 function slugify(t: string) {
-	return t.replace(/[^a-z0-9一-龥]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/, '') || 'post'
+	return (
+		t
+			.replace(/[^a-z0-9一-龥]/gi, "-")
+			.replace(/-+/g, "-")
+			.replace(/^-|-$/, "") || "post"
+	);
 }
 
 function setup() {
-	if (!cfg.pat || !cfg.owner || !cfg.repo) { errorMsg = '请填写所有必填项'; return }
-	localStorage.setItem('blog-admin-cfg', JSON.stringify(cfg))
-	errorMsg = ''; view = 'list'; loadList()
+	if (!cfg.pat || !cfg.owner || !cfg.repo) {
+		errorMsg = "请填写所有必填项";
+		return;
+	}
+	localStorage.setItem("blog-admin-cfg", JSON.stringify(cfg));
+	errorMsg = "";
+	view = "list";
+	loadList();
 }
 
 function logout() {
-	if (!confirm('确定退出？')) return
-	localStorage.removeItem('blog-admin-cfg')
-	cfg = { pat: '', owner: '', repo: '', branch: 'master' }
-	postList = []; post = null; view = 'setup'
+	if (!confirm("确定退出？")) return;
+	localStorage.removeItem("blog-admin-cfg");
+	cfg = { pat: "", owner: "", repo: "", branch: "master" };
+	postList = [];
+	post = null;
+	view = "setup";
 }
 
-function dismissSuccess() { successMsg = '' }
-function dismissError() { errorMsg = '' }
+function dismissSuccess() {
+	successMsg = "";
+}
+function dismissError() {
+	errorMsg = "";
+}
 </script>
 
 <!-- ===== SETUP VIEW ===== -->
