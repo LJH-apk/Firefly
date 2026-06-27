@@ -72,8 +72,8 @@ export const siteConfig: SiteConfig = {
 		// 4. 网络图片: { type: "url", value: "https://example.com/logo.png", alt: "Logo" }
 		logo: {
 			type: "image",
-			value: "assets/images/columbia-avatar.png",
-			alt: "✨",
+			value: "assets/images/firefly.png",
+			alt: "Firefly",
 		},
 		// 导航栏标题
 		title: "小刘の宝藏空间",
