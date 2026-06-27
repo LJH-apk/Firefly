@@ -1,29 +1,56 @@
 ---
-title: 测试文章
+title: KaTeX 数学公式测试
 published: 2026-06-27
-description: 无意义，仅用于测试
-author: "LJH"
-tags: [开发,测试]
-category: 开发
+description: 测试对 KaTeX 数学公式的支持，包括行内公式、块级公式和复杂数学符号。
+tags: [KaTeX, Math, 测试]
+category: 测试文章
 draft: false
+image: api
 ---
 
-### 公式样式
+本文测试了 KaTeX 数学公式的渲染支持。
 
-- 积分
+## 行内公式 (Inline)
+
+行内公式使用单个 `$` 符号包裹。
+
+例如：欧拉公式 $e^{i\pi} + 1 = 0$ 是数学中最优美的公式之一。
+
+质能方程 $E = mc^2$ 也是家喻户晓。
+
+## 块级公式 (Block)
+
+块级公式使用两个 `$$` 符号包裹，会居中显示。
+
 $$
 \int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
 $$
 
-- 矩阵
+$$
+x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+$$
+
+## 复杂示例
+
+### 矩阵 (Matrices)
+
 $$
 \begin{pmatrix}
 a & b \\
 c & d
 \end{pmatrix}
+\begin{pmatrix}
+\alpha & \beta \\
+\gamma & \delta
+\end{pmatrix} =
+\begin{pmatrix}
+a\alpha + b\gamma & a\beta + b\delta \\
+c\alpha + d\gamma & c\beta + d\delta
+\end{pmatrix}
 $$
 
-- 求和与极限
+### 极限与求和 (Limits and Sums)
+
 $$
 \sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
 $$
@@ -32,40 +59,33 @@ $$
 \lim_{x \to 0} \frac{\sin x}{x} = 1
 $$
 
-- 化学方程式
+### 麦克斯韦方程组 (Maxwell's Equations)
+
+$$
+\begin{aligned}
+\nabla \cdot \mathbf{E} &= \frac{\rho}{\varepsilon_0} \\
+\nabla \cdot \mathbf{B} &= 0 \\
+\nabla \times \mathbf{E} &= -\frac{\partial \mathbf{B}}{\partial t} \\
+\nabla \times \mathbf{B} &= \mu_0\mathbf{J} + \mu_0\varepsilon_0\frac{\partial \mathbf{E}}{\partial t}
+\end{aligned}
+$$
+
+### 化学方程式 (Chemical Equations)
+
 $$
 \ce{CH4 + 2O2 -> CO2 + 2H2O}
 $$
 
-### 提示框测试
-> [!NOTE] 提示
-> 突出显示用户应该注意的信息。
+## 更多符号
 
-> [!TIP] 建议
-> 可选信息，帮助用户更成功。
+| 符号 | 代码 | 渲染结果 |
+| :--- | :--- | :--- |
+| Alpha | `\alpha` | $\alpha$ |
+| Beta | `\beta` | $\beta$ |
+| Gamma | `\Gamma` | $\Gamma$ |
+| Pi | `\pi` | $\pi$ |
+| Infinity | `\infty` | $\infty$ |
+| Right Arrow | `\rightarrow` | $\rightarrow$ |
+| Partial | `\partial` | $\partial$ |
 
-> [!IMPORTANT] 重要
-> 用户必须了解的关键信息。
-
-> [!WARNING] 警告
-> 需要立即注意的关键内容。
-
-> [!CAUTION] 注意
-> 行动的负面潜在后果。
-
-### 代码样式测试
-
-```python
-class Solution:
-    def mySqrt(self, x: int) -> int:
-        inf = 1e-3
-        guess = x
-        while True:
-            try:
-                next_guess = (guess + x / guess) / 2.0
-            except ZeroDivisionError:
-                return 0
-            if abs(next_guess - guess) < inf:
-                return int(next_guess)
-            guess = next_guess
-```
+更多 KaTeX 语法请参考 [KaTeX Supported Functions](https://katex.org/docs/supported.html)。

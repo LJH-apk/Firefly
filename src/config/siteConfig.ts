@@ -12,7 +12,7 @@ export const siteConfig: SiteConfig = {
 	subtitle: "愿此行，终抵群星。",
 
 	// 站点 URL
-	site_url: "https://your-domain.pages.dev",
+	site_url: "https://cf-blog.liujiahang.icu",
 
 	// 站点描述
 	description: "小刘同学的个人博客，记录生活、思考与探索。愿此行，终抵群星。",
