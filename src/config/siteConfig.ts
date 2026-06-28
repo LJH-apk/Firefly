@@ -6,7 +6,7 @@ const SITE_LANG = "zh_CN";
 
 export const siteConfig: SiteConfig = {
 	// 站点标题
-	title: "小刘の宝藏空间",
+	title: "小刘の神秘小站",
 
 	// 站点副标题
 	subtitle: "愿此行，终抵群星。",
