@@ -4,8 +4,8 @@ published: 2026-06-28
 description: 本篇是博主的一些碎碎念，主要是一些感想和Python学习方法的分享
 tags: [Code, Python]
 category: Python入门指南
-draft: true
-image: ""
+draft: false
+image: "api"
 ---
 
 ## Python入门指南(0)——重新出发
