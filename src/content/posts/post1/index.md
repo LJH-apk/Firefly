@@ -4,7 +4,7 @@ published: 2026-06-27
 description: 测试对 KaTeX 数学公式的支持，包括行内公式、块级公式和复杂数学符号。
 tags: [KaTeX, Math, 测试]
 category: 测试文章
-draft: false
+draft: true
 image: api
 ---
 

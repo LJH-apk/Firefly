@@ -15,10 +15,10 @@ export const siteConfig: SiteConfig = {
 	site_url: "https://cf-blog.liujiahang.icu",
 
 	// 站点描述
-	description: "小刘同学的个人博客，记录生活、思考与探索。愿此行，终抵群星。",
+	description: "counter的个人博客，记录生活、思考与探索。愿此行，终抵群星。",
 
 	// 站点关键词
-	keywords: ["小刘同学", "博客", "个人博客", "生活", "随笔"],
+	keywords: ["counter", "博客", "个人博客", "生活", "随笔"],
 
 	// 主题色
 	themeColor: {
@@ -147,7 +147,7 @@ export const siteConfig: SiteConfig = {
 		// 是否开启分享海报生成功能
 		sharePoster: true,
 		// OpenGraph图片功能，注意开启后要渲染很长时间，不建议本地调试的时候开启
-		generateOgImages: false,
+		generateOgImages: true,
 	},
 
 	// bangumi配置
