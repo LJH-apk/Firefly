@@ -46,7 +46,7 @@ if (process.env.NODE_ENV === "development") {
 	setMaxListeners(20);
 }
 
-const adapter = process.env.CF_WORKERS
+const adapter = (process.env.CF_WORKERS || process.env.CF_PAGES)
 	? cloudflare({
 			prerenderEnvironment: "node",
 		})
