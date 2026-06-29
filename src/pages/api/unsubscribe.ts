@@ -1,5 +1,6 @@
 export const prerender = false;
 
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 
 const SITE_URL = "https://cf-blog.liujiahang.icu";
@@ -33,13 +34,8 @@ function renderPage(title: string, message: string): string {
 </html>`;
 }
 
-export const GET: APIRoute = async ({ locals, url }) => {
+export const GET: APIRoute = async ({ url }) => {
 	const htmlHeaders = { "Content-Type": "text/html;charset=utf-8" };
-	const env = locals.runtime?.env;
-
-	if (!env?.SUBSCRIBERS) {
-		return new Response(renderPage("服务错误", "服务暂不可用，请稍后重试。"), { status: 503, headers: htmlHeaders });
-	}
 
 	const token = url.searchParams.get("token");
 	if (!token) {

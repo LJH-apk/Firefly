@@ -1,27 +1,7 @@
 /// <reference types="astro/client" />
 /// <reference path="../.astro/types.d.ts" />
 
-interface CfKVNamespace {
-	get(key: string): Promise<string | null>;
-	put(key: string, value: string): Promise<void>;
-	delete(key: string): Promise<void>;
-	list(opts?: { prefix?: string }): Promise<{ keys: { name: string }[] }>;
-}
-
-interface CloudflareEnv {
-	SUBSCRIBERS: CfKVNamespace;
-	RESEND_API_KEY: string;
-	NOTIFY_SECRET: string;
-}
-
 declare global {
-	namespace App {
-		interface Locals {
-			runtime: {
-				env: CloudflareEnv;
-			};
-		}
-	}
 	interface ImportMetaEnv {
 		readonly MEILI_MASTER_KEY: string;
 	}

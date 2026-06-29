@@ -1,5 +1,6 @@
 export const prerender = false;
 
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 
 const SITE_URL = "https://cf-blog.liujiahang.icu";
@@ -18,20 +19,14 @@ function escapeHtml(str: string): string {
 	return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-export const POST: APIRoute = async ({ locals, request }) => {
+export const POST: APIRoute = async ({ request }) => {
 	const jsonHeaders = { "Content-Type": "application/json" };
-	const env = locals.runtime?.env;
-
-	if (!env?.SUBSCRIBERS) {
-		return new Response(JSON.stringify({ error: "服务暂不可用" }), { status: 503, headers: jsonHeaders });
-	}
 
 	const authHeader = request.headers.get("Authorization");
 	if (!authHeader || authHeader !== `Bearer ${env.NOTIFY_SECRET}`) {
 		return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: jsonHeaders });
 	}
 
-	// 从已部署的站点拉取最新文章列表
 	let posts: PostMeta[];
 	try {
 		const res = await fetch(`${SITE_URL}/api/allPostMeta.json`);
@@ -50,7 +45,6 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		return new Response(JSON.stringify({ message: "No new posts", notified: 0 }), { status: 200, headers: jsonHeaders });
 	}
 
-	// 获取所有订阅者
 	const { keys } = await env.SUBSCRIBERS.list({ prefix: "sub:" });
 	const subscribers: { email: string; token: string }[] = [];
 	for (const key of keys) {
@@ -58,7 +52,6 @@ export const POST: APIRoute = async ({ locals, request }) => {
 		if (raw) subscribers.push(JSON.parse(raw));
 	}
 
-	// 群发通知邮件
 	let successCount = 0;
 	for (const subscriber of subscribers) {
 		const unsubscribeUrl = `${SITE_URL}/api/unsubscribe?token=${subscriber.token}`;

@@ -1,5 +1,6 @@
 export const prerender = false;
 
+import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 
 const SITE_URL = "https://cf-blog.liujiahang.icu";
@@ -16,14 +17,13 @@ function isValidEmail(email: string): boolean {
 	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-export const POST: APIRoute = async ({ locals, request }) => {
+export const POST: APIRoute = async ({ request }) => {
 	const headers = {
 		"Content-Type": "application/json",
 		"Access-Control-Allow-Origin": SITE_URL,
 	};
 
-	const env = locals.runtime?.env;
-	if (!env?.SUBSCRIBERS) {
+	if (!env.SUBSCRIBERS) {
 		return new Response(JSON.stringify({ error: "服务暂不可用" }), { status: 503, headers });
 	}
 
@@ -48,7 +48,6 @@ export const POST: APIRoute = async ({ locals, request }) => {
 	await env.SUBSCRIBERS.put(`sub:${token}`, JSON.stringify({ email, token, subscribedAt: new Date().toISOString() }));
 	await env.SUBSCRIBERS.put(`email_index:${email}`, token);
 
-	// 发送欢迎邮件
 	const unsubscribeUrl = `${SITE_URL}/api/unsubscribe?token=${token}`;
 	await fetch("https://api.resend.com/emails", {
 		method: "POST",
