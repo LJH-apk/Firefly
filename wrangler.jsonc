@@ -2,12 +2,19 @@
 	"name": "firefly",
 	"main": "worker.ts",
 	"compatibility_date": "2025-01-01",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
 	"assets": {
 		"directory": "./dist",
 		"binding": "ASSETS"
 	},
-	
+	"observability": {
+		"logs": {
+			"enabled": true,
+			"invocation_logs": true
+		}
+	},
 	"kv_namespaces": [
 		{
 			"binding": "SUBSCRIBERS",
