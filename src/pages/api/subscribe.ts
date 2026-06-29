@@ -59,14 +59,14 @@ export const POST: APIRoute = async ({ request }) => {
 			html: `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"></head>
 <body style="font-family:-apple-system,sans-serif;background:#f5f5f5;margin:0;padding:24px">
   <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
-    <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:32px 24px;text-align:center">
-      <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">订阅成功 ✨</h1>
+    <div style="background:linear-gradient(135deg,#7e22ce,#9333ea);padding:32px 24px;text-align:center">
+      <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">订阅成功</h1>
     </div>
     <div style="padding:28px 24px">
       <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 12px">感谢订阅「小刘の神秘小站」！</p>
       <p style="color:#6b7280;font-size:14px;line-height:1.6;margin:0">今后每当有新文章发布，您都会第一时间收到通知。</p>
       <div style="border-top:1px solid #e5e7eb;margin-top:24px;padding-top:14px">
-        <a href="${unsubscribeUrl}" style="color:#9ca3af;font-size:12px;text-decoration:none">不想再收到通知？点击退订</a>
+        <a href="${unsubscribeUrl}" style="color:#a855f7;font-size:12px;text-decoration:none">不想再收到通知？点击退订</a>
       </div>
     </div>
   </div>
