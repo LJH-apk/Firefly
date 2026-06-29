@@ -228,6 +228,11 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 	// 这些组件只在移动端(<768px)显示在页面底部，独立于左右侧边栏配置
 	mobileBottomComponents: [
 		{
+			type: "subscribe",
+			enable: true,
+			showOnPostPage: false,
+		},
+		{
 			// 组件类型：用户资料组件
 			type: "profile",
 			// 是否启用该组件
