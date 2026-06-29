@@ -4,12 +4,13 @@
 	"compatibility_date": "2025-01-01",
 	"compatibility_flags": ["nodejs_compat"],
 	"assets": {
-		"directory": "./dist"
+		"directory": "./dist",
+		"binding": "ASSETS"
 	},
+	
 	"kv_namespaces": [
 		{
 			"binding": "SUBSCRIBERS",
-			// 运行 `pnpm dlx wrangler kv namespace create SUBSCRIBERS` 后将输出的 id 填入此处
 			"id": "954f59b53ef942a99d14d91255f32136"
 		}
 	]
