@@ -4,7 +4,7 @@ import { env } from "cloudflare:workers";
 import type { APIRoute } from "astro";
 
 const SITE_URL = "https://cf-blog.liujiahang.icu";
-const FROM_EMAIL = "noreply@cf-blog.liujiahang.icu";
+const FROM_EMAIL = "noreply@liujiahang.icu";
 const FROM_NAME = "小刘の神秘小站";
 
 interface PostMeta {
