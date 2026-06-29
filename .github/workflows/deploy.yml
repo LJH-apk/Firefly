@@ -37,3 +37,10 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: 通知订阅者
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" -X POST https://cf-blog.liujiahang.icu/api/notify \
+            -H "Authorization: Bearer $NOTIFY_SECRET"
+        env:
+          NOTIFY_SECRET: ${{ secrets.NOTIFY_SECRET }}

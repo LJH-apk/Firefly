@@ -1,0 +1,139 @@
+---
+import { Icon } from "astro-icon/components";
+import WidgetLayout from "@/components/common/WidgetLayout.astro";
+import type { WidgetComponentConfig } from "@/types/config";
+
+interface Props {
+	class?: string;
+	style?: string;
+	widgetConfig?: WidgetComponentConfig;
+}
+
+const { class: className, style, widgetConfig } = Astro.props;
+const showTitle = widgetConfig?.showTitle !== false;
+---
+
+<WidgetLayout
+  name="订阅更新"
+  showTitle={showTitle}
+  id="subscribe"
+  class={className}
+  style={style}
+>
+  <subscribe-widget>
+    <p class="text-neutral-600 dark:text-neutral-300 text-sm leading-relaxed mb-3">
+      输入邮箱，新文章发布时即时通知。
+    </p>
+
+    <div class="subscribe-form flex flex-col gap-2">
+      <input
+        type="email"
+        placeholder="your@email.com"
+        autocomplete="email"
+        class="w-full px-3 py-2 rounded-lg text-sm
+               bg-neutral-100/60 dark:bg-neutral-800/50
+               text-neutral-900 dark:text-neutral-100
+               border border-neutral-200 dark:border-neutral-700
+               placeholder:text-neutral-400 dark:placeholder:text-neutral-500
+               focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40
+               transition"
+      />
+      <button
+        type="button"
+        class="subscribe-btn btn-regular rounded-lg h-9 px-4 text-sm font-medium active:scale-95 transition-transform w-full"
+      >
+        <span class="subscribe-btn-text">订阅</span>
+        <Icon is:inline name="fa7-solid:paper-plane" class="subscribe-btn-icon ml-1.5 text-xs hidden" />
+      </button>
+    </div>
+
+    <p class="subscribe-msg text-sm mt-2 hidden"></p>
+  </subscribe-widget>
+</WidgetLayout>
+
+<script>
+  class SubscribeWidget extends HTMLElement {
+    private input: HTMLInputElement | null;
+    private btn: HTMLButtonElement | null;
+    private msg: HTMLElement | null;
+    private form: HTMLElement | null;
+
+    constructor() {
+      super();
+      this.input = this.querySelector("input[type=email]");
+      this.btn = this.querySelector(".subscribe-btn");
+      this.msg = this.querySelector(".subscribe-msg");
+      this.form = this.querySelector(".subscribe-form");
+
+      // If already subscribed in this browser, show success state
+      if (localStorage.getItem("blog_subscribed") === "1") {
+        this.showSuccess("您已订阅，感谢关注！");
+        return;
+      }
+
+      this.btn?.addEventListener("click", () => this.handleSubmit());
+      this.input?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") this.handleSubmit();
+      });
+    }
+
+    private async handleSubmit() {
+      const email = this.input?.value.trim() ?? "";
+      if (!email) {
+        this.showError("请输入邮箱地址");
+        return;
+      }
+
+      this.setLoading(true);
+
+      try {
+        const res = await fetch("/api/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json() as { success?: boolean; error?: string };
+
+        if (res.ok && data.success) {
+          localStorage.setItem("blog_subscribed", "1");
+          this.showSuccess("订阅成功！请检查邮箱确认。");
+        } else if (res.status === 409) {
+          localStorage.setItem("blog_subscribed", "1");
+          this.showSuccess("该邮箱已订阅，感谢关注！");
+        } else {
+          this.showError(data.error ?? "订阅失败，请稍后重试");
+        }
+      } catch {
+        this.showError("网络错误，请稍后重试");
+      } finally {
+        this.setLoading(false);
+      }
+    }
+
+    private setLoading(loading: boolean) {
+      if (!this.btn) return;
+      this.btn.disabled = loading;
+      const text = this.btn.querySelector(".subscribe-btn-text");
+      if (text) text.textContent = loading ? "提交中..." : "订阅";
+    }
+
+    private showSuccess(message: string) {
+      this.form?.classList.add("hidden");
+      if (this.msg) {
+        this.msg.textContent = message;
+        this.msg.className = "subscribe-msg text-sm mt-2 text-[var(--primary)]";
+      }
+    }
+
+    private showError(message: string) {
+      if (this.msg) {
+        this.msg.textContent = message;
+        this.msg.className = "subscribe-msg text-sm mt-2 text-red-500 dark:text-red-400";
+      }
+    }
+  }
+
+  if (!customElements.get("subscribe-widget")) {
+    customElements.define("subscribe-widget", SubscribeWidget);
+  }
+</script>
