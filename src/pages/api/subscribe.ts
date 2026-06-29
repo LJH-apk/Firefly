@@ -49,7 +49,7 @@ export const POST: APIRoute = async ({ request }) => {
 	await env.SUBSCRIBERS.put(`email_index:${email}`, token);
 
 	const unsubscribeUrl = `${SITE_URL}/api/unsubscribe?token=${token}`;
-	await fetch("https://api.resend.com/emails", {
+	const emailRes = await fetch("https://api.resend.com/emails", {
 		method: "POST",
 		headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
 		body: JSON.stringify({
@@ -73,6 +73,10 @@ export const POST: APIRoute = async ({ request }) => {
 </body></html>`,
 		}),
 	});
+	if (!emailRes.ok) {
+		const errText = await emailRes.text();
+		console.error(`[subscribe] Resend error ${emailRes.status}: ${errText}`);
+	}
 
 	return new Response(JSON.stringify({ success: true }), { status: 200, headers });
 };
