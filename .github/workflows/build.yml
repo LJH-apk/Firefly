@@ -65,3 +65,5 @@ jobs:
 
       - name: Run Astro Build
         run: pnpm astro build
+        env:
+          CF_WORKERS: true
