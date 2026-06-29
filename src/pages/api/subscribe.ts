@@ -27,7 +27,7 @@ export const POST: APIRoute = async ({ request }) => {
 		return new Response(JSON.stringify({ error: "服务暂不可用" }), { status: 503, headers });
 	}
 
-	let body: { email?: string };
+	let body: { email?: string; categories?: string[] };
 	try {
 		body = await request.json();
 	} catch {
@@ -39,13 +39,16 @@ export const POST: APIRoute = async ({ request }) => {
 		return new Response(JSON.stringify({ error: "邮箱格式不正确" }), { status: 400, headers });
 	}
 
+	const categories = (body.categories ?? []).filter((c) => typeof c === "string" && c.trim());
+	const finalCategories = categories.length > 0 ? categories : ["全部"];
+
 	const existing = await env.SUBSCRIBERS.get(`email_index:${email}`);
 	if (existing) {
 		return new Response(JSON.stringify({ error: "该邮箱已订阅" }), { status: 409, headers });
 	}
 
 	const token = generateToken();
-	await env.SUBSCRIBERS.put(`sub:${token}`, JSON.stringify({ email, token, subscribedAt: new Date().toISOString() }));
+	await env.SUBSCRIBERS.put(`sub:${token}`, JSON.stringify({ email, token, subscribedAt: new Date().toISOString(), categories: finalCategories }));
 	await env.SUBSCRIBERS.put(`email_index:${email}`, token);
 
 	const unsubscribeUrl = `${SITE_URL}/api/unsubscribe?token=${token}`;
@@ -63,8 +66,9 @@ export const POST: APIRoute = async ({ request }) => {
       <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">订阅成功</h1>
     </div>
     <div style="padding:28px 24px">
-      <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 12px">感谢订阅「小刘の神秘小站」！</p>
-      <p style="color:#6b7280;font-size:14px;line-height:1.6;margin:0">今后每当有新文章发布，您都会第一时间收到通知。</p>
+      <p style="color:#374151;font-size:15px;line-height:1.6;margin:0 0 8px">感谢订阅「小刘の神秘小站」！</p>
+      <p style="color:#6b7280;font-size:14px;line-height:1.6;margin:0 0 8px">已订阅分类：<strong style="color:#9333ea">${finalCategories.join("、")}</strong></p>
+      <p style="color:#6b7280;font-size:14px;line-height:1.6;margin:0">今后该分类有新文章发布，您将第一时间收到通知。</p>
       <div style="border-top:1px solid #e5e7eb;margin-top:24px;padding-top:14px">
         <a href="${unsubscribeUrl}" style="color:#a855f7;font-size:12px;text-decoration:none">不想再收到通知？点击退订</a>
       </div>

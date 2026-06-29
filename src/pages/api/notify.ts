@@ -12,6 +12,7 @@ interface PostMeta {
 	title: string;
 	description: string;
 	published: number;
+	category: string;
 	password: boolean;
 }
 
@@ -46,7 +47,7 @@ export const POST: APIRoute = async ({ request }) => {
 	}
 
 	const { keys } = await env.SUBSCRIBERS.list({ prefix: "sub:" });
-	const subscribers: { email: string; token: string }[] = [];
+	const subscribers: { email: string; token: string; categories?: string[] }[] = [];
 	for (const key of keys) {
 		const raw = await env.SUBSCRIBERS.get(key.name);
 		if (raw) subscribers.push(JSON.parse(raw));
@@ -54,8 +55,14 @@ export const POST: APIRoute = async ({ request }) => {
 
 	let successCount = 0;
 	for (const subscriber of subscribers) {
+		const subCats = subscriber.categories ?? ["全部"];
+		const postsForSub = newPosts.filter(
+			(p) => subCats.includes("全部") || subCats.includes(p.category),
+		);
+		if (postsForSub.length === 0) continue;
+
 		const unsubscribeUrl = `${SITE_URL}/api/unsubscribe?token=${subscriber.token}`;
-		const postCards = newPosts.map((post) => {
+		const postCards = postsForSub.map((post) => {
 			const postUrl = `${SITE_URL}/posts/${post.id}/`;
 			return `<div style="border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-bottom:12px">
   <h2 style="font-size:16px;font-weight:700;margin:0 0 8px">
@@ -66,9 +73,9 @@ export const POST: APIRoute = async ({ request }) => {
 </div>`;
 		}).join("");
 
-		const subject = newPosts.length === 1
-			? `新文章：${newPosts[0].title}`
-			: `${newPosts.length} 篇新文章发布了 — 小刘の神秘小站`;
+		const subject = postsForSub.length === 1
+			? `新文章：${postsForSub[0].title}`
+			: `${postsForSub.length} 篇新文章发布了 — 小刘の神秘小站`;
 
 		const res = await fetch("https://api.resend.com/emails", {
 			method: "POST",

@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import WidgetLayout from "@/components/common/WidgetLayout.astro";
+import { getSortedPosts } from "@/utils/content-utils";
 import type { WidgetComponentConfig } from "@/types/config";
 
 interface Props {
@@ -11,6 +12,9 @@ interface Props {
 
 const { class: className, style, widgetConfig } = Astro.props;
 const showTitle = widgetConfig?.showTitle !== false;
+
+const posts = await getSortedPosts();
+const categories = [...new Set(posts.map((p) => p.data.category).filter(Boolean))].sort() as string[];
 ---
 
 <WidgetLayout
@@ -20,7 +24,7 @@ const showTitle = widgetConfig?.showTitle !== false;
   class={className}
   style={style}
 >
-  <subscribe-widget>
+  <subscribe-widget data-categories={JSON.stringify(categories)}>
     <p class="text-neutral-600 dark:text-neutral-300 text-sm leading-relaxed mb-3">
       输入邮箱，新文章发布时即时通知。
     </p>
@@ -38,6 +42,27 @@ const showTitle = widgetConfig?.showTitle !== false;
                focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/40
                transition"
       />
+
+      {categories.length > 0 && (
+        <div>
+          <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-1.5">选择订阅分类：</p>
+          <div class="category-chips flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              data-cat="全部"
+              class="chip chip-selected rounded-full px-2.5 py-0.5 text-xs border transition-colors"
+            >全部</button>
+            {categories.map((cat) => (
+              <button
+                type="button"
+                data-cat={cat}
+                class="chip rounded-full px-2.5 py-0.5 text-xs border transition-colors"
+              >{cat}</button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <button
         type="button"
         class="subscribe-btn btn-regular rounded-lg h-9 px-4 text-sm font-medium active:scale-95 transition-transform w-full"
@@ -51,12 +76,37 @@ const showTitle = widgetConfig?.showTitle !== false;
   </subscribe-widget>
 </WidgetLayout>
 
+<style>
+  .chip {
+    background-color: rgb(245 245 245 / 0.6);
+    border-color: rgb(229 229 229);
+    color: rgb(82 82 82);
+    cursor: pointer;
+  }
+  :global(.dark) .chip {
+    background-color: rgb(38 38 38 / 0.5);
+    border-color: rgb(64 64 64);
+    color: rgb(163 163 163);
+  }
+  .chip-selected {
+    background-color: var(--primary);
+    border-color: transparent;
+    color: white;
+  }
+  :global(.dark) .chip-selected {
+    background-color: var(--primary);
+    border-color: transparent;
+    color: white;
+  }
+</style>
+
 <script>
   class SubscribeWidget extends HTMLElement {
     private input: HTMLInputElement | null;
     private btn: HTMLButtonElement | null;
     private msg: HTMLElement | null;
     private form: HTMLElement | null;
+    private selectedCategories: Set<string>;
 
     constructor() {
       super();
@@ -64,16 +114,52 @@ const showTitle = widgetConfig?.showTitle !== false;
       this.btn = this.querySelector(".subscribe-btn");
       this.msg = this.querySelector(".subscribe-msg");
       this.form = this.querySelector(".subscribe-form");
+      this.selectedCategories = new Set(["全部"]);
 
-      // If already subscribed in this browser, show success state
       if (localStorage.getItem("blog_subscribed") === "1") {
         this.showSuccess("您已订阅，感谢关注！");
         return;
       }
 
+      this.initChips();
       this.btn?.addEventListener("click", () => this.handleSubmit());
       this.input?.addEventListener("keydown", (e) => {
         if (e.key === "Enter") this.handleSubmit();
+      });
+    }
+
+    private initChips() {
+      const chips = this.querySelectorAll<HTMLButtonElement>(".chip");
+      chips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          const cat = chip.dataset.cat ?? "";
+          if (cat === "全部") {
+            this.selectedCategories = new Set(["全部"]);
+          } else {
+            this.selectedCategories.delete("全部");
+            if (this.selectedCategories.has(cat)) {
+              this.selectedCategories.delete(cat);
+            } else {
+              this.selectedCategories.add(cat);
+            }
+            if (this.selectedCategories.size === 0) {
+              this.selectedCategories.add("全部");
+            }
+          }
+          this.updateChips();
+        });
+      });
+    }
+
+    private updateChips() {
+      const chips = this.querySelectorAll<HTMLButtonElement>(".chip");
+      chips.forEach((chip) => {
+        const cat = chip.dataset.cat ?? "";
+        if (this.selectedCategories.has(cat)) {
+          chip.classList.add("chip-selected");
+        } else {
+          chip.classList.remove("chip-selected");
+        }
       });
     }
 
@@ -90,7 +176,7 @@ const showTitle = widgetConfig?.showTitle !== false;
         const res = await fetch("/api/subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({ email, categories: [...this.selectedCategories] }),
         });
         const data = await res.json() as { success?: boolean; error?: string };
 
